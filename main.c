@@ -12,10 +12,14 @@ typedef struct
 nodo* IniciarNodo ();
 nodo* agregarPpio(nodo* lista, nodo* nuevoNodo);
 nodo* cargarNodo(nodo* lista);
+nodo* cargarNodoARCHI(nodo* lista, FILE* archivo);
 nodo* pasarDatosLIS(nodo* lista, FILE* archivo);
+nodo* ordenarNodo (nodo* lista, nodo* nuevoNodo);
+nodo* cargarNodoOrdenado(nodo* lista, FILE* archivo);
 void recorrerLista (nodo* lista);
 void escribir(nodo* aux);
 void cargarArchivo();
+int recorrerArchivo (FILE* archivo);
 int cargarUnArchivo();
 
 
@@ -24,29 +28,49 @@ int main()
     int opc;
     nodo* lista;
     FILE* archivo;
+    int menor;
 
     printf("Ingresa el ejercicio: ");
     fflush(stdin);
     scanf("%d", &opc);
 
-    switch(opc){
+    switch(opc)
+    {
 
     case 1:
 
-                lista = IniciarNodo();
+        lista = IniciarNodo();
 
-                printf(" + Datos de mi Archivo: \n\n");
-                mostrarArchivo(archivo);
+        printf(" + Datos de mi Archivo: \n\n");
+        mostrarArchivo(archivo);
 
-                archivo = fopen("miArchivo.bin", "ab");
-                lista = pasarDatosLIS(archivo, lista);
-                fclose(archivo);
+//                lista = cargarNodo(lista);
+//                recorrerLista(lista);
 
-                recorrerLista(lista);
+
+        printf("\n + Datos de la lista: \n\n");
+        archivo = fopen("miArchivo.bin", "rb");
+        lista = cargarNodoARCHI(lista, archivo);
+        fclose(archivo);
+
+        recorrerLista(lista);
+
 
         break;
 
     case 2:
+
+//        archivo = fopen("miArchivo.bin", "ab");
+//        cargarArchivo(archivo);
+//        fclose(archivo);
+
+
+
+        archivo = fopen("miArchivo.bin", "rb");
+        lista = cargarNodoOrdenado(lista, archivo);
+        fclose(archivo);
+
+        recorrerLista(lista);
 
         break;
 
@@ -129,23 +153,83 @@ nodo* cargarNodo(nodo* lista)
 
     return lista;
 }
-
 void recorrerLista (nodo* lista)
 {
 
     nodo * seg = lista;
-    while(lista != NULL){
+    while(lista != NULL)
+    {
 
         escribir(seg);
         seg = seg->sig;
     }
 }
-
 void escribir(nodo* seg)
 {
 
     printf("| %i |", seg->dato);
 }
+nodo* cargarNodoARCHI(nodo* lista, FILE* archivo)
+{
+
+    nodo* nuevoNodo;
+    int num;
+
+    while(fread(&num, sizeof(int), 1, archivo) > 0)
+    {
+
+        nuevoNodo = crearNodo(num);
+
+        lista = agregarPpio(lista, nuevoNodo);
+    }
+
+    return lista;
+}
+
+nodo* cargarNodoOrdenado(nodo* lista, FILE* archivo)
+{
+
+    nodo* nuevoNodo;
+    int num;
+
+    while(fread(&num, sizeof(int), 1, archivo) > 0)
+    {
+
+        nuevoNodo = crearNodo(num);
+
+        lista = ordenarNodo(lista, nuevoNodo);
+    }
+
+    return lista;
+}
+nodo* ordenarNodo (nodo* lista, nodo* nuevoNodo)
+{
+
+    nodo* aux;
+    while(lista != NULL)
+    {
+        
+    if(lista == NULL)
+    {
+
+        lista = nuevoNodo;
+    }
+    else if(lista->dato > nuevoNodo->dato)
+    {
+
+            aux = lista;
+            lista = nuevoNodo;
+            lista->sig = aux;
+    }
+
+        
+    }
+    return lista;
+}
+
+
+
+/*ARCHIVOS*/
 
 int cargarUnArchivo()
 {
@@ -216,30 +300,4 @@ void mostrarArchivo(FILE* archivo)
         fclose(archivo);
     }
 }
-
-nodo* cargarNodoARCHI(nodo* lista, FILE* archivo)
-{
-
-    nodo* nuevoNodo;
-    int num;
-
-        fread(&num, sizeof(int), 1, archivo);
-
-        nuevoNodo = crearNodo(num);
-
-        lista = agregarPpio(lista, nuevoNodo);
-
-    return lista;
-}
-
-nodo* pasarDatosLIS(nodo* lista, FILE* archivo)
-{
-
-    while(lista != NULL){
-
-         lista = cargarNodoARCHI(lista, archivo);
-
-    }
-
-    return lista;
 }
