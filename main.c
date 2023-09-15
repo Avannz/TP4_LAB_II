@@ -16,17 +16,21 @@ nodo* cargarNodoARCHI(nodo* lista, FILE* archivo);
 nodo* pasarDatosLIS(nodo* lista, FILE* archivo);
 nodo* ordenarNodo (nodo* lista, nodo* nuevoNodo);
 nodo* cargarNodoOrdenado(nodo* lista);
+nodo* intercalarDatos(nodo* lista1, nodo* lista2);
 void recorrerLista (nodo* lista);
 void escribir(nodo* aux);
 void cargarArchivo();
 int recorrerArchivo (FILE* archivo);
 int cargarUnArchivo();
+int buscarDato(nodo*lista,int dato); //GIANINI
 
 
 int main()
 {
     int opc;
     nodo* lista;
+    nodo* lista1;
+    nodo* lista2;
     FILE* archivo;
     int menor;
     int dato;
@@ -62,39 +66,43 @@ int main()
 
     case 2:
 
-//        archivo = fopen("miArchivo.bin", "ab");
-//        cargarArchivo(archivo);
-//        fclose(archivo);
-
+        archivo = fopen("miArchivo.bin", "ab");
+        cargarArchivo(archivo);
+        fclose(archivo);
+        lista = IniciarNodo();
         lista = cargarNodoOrdenado(lista);
-        recorrerLista(lista); //NO FUNCA. nose PQ!
+        recorrerLista(lista);
 
         break;
 
     case 3:
 
-            lista = cargarNodo(lista);
+        lista = cargarNodo(lista);
 
-            printf("Ingresa el dato ha encontrar: ");
-            fflush(stdin);
-            scanf("%d", &dato);
+        printf("Ingresa el dato ha encontrar: ");
+        fflush(stdin);
+        scanf("%d", &dato);
 
-            flag = busquedaDatoNodo(lista, dato);
+        flag = buscarDato(lista, dato);
 
-            if(flag == 1)
-            {
+        if(flag == 1)
+        {
 
-                printf("Dato existente :D");
-            }
-            /*else if(flag == 0)        //PQ NO ME DICE QUE NO EXISTE???
-            {
-
-                printf("Dato inexistente D:");
-            }*/
-
+            printf("Dato existente :D");
+        }
         break;
 
     case 4:
+
+        lista1 = IniciarNodo();
+        lista2 = IniciarNodo();
+
+        lista1 = cargarNodo(lista1);
+        lista2 = cargarNodo(lista2);
+
+        lista1 = intercalarDatos(lista1, lista2);
+
+        recorrerLista(lista1);
 
         break;
 
@@ -213,9 +221,8 @@ nodo* cargarNodoOrdenado(nodo* lista)
     {
         printf("EL ARCHIVO SE HA ABIERTO\n");
 
-        while(!feof(archivo))
+        while(fread(&num, sizeof(int), 1, archivo) > 0)
         {
-            fread(&num, sizeof(int), 1, archivo);
             nuevoNodo = crearNodo(num);
             lista = ordenarNodo(lista, nuevoNodo);
         }
@@ -236,8 +243,7 @@ nodo* ordenarNodo (nodo* lista, nodo* nuevoNodo)
     nodo* seg;
     nodo* ante;
 
-    ante = lista;
-    seg = lista->sig;
+
 
     /*COMPROBACION DE EXISTENCIA*/
 
@@ -248,28 +254,38 @@ nodo* ordenarNodo (nodo* lista, nodo* nuevoNodo)
     }
     else
     {
-
-        /*RECORRIDO DE LA LISTA, HASTA EL INSERTAR*/
-
-        while(ante->dato > nuevoNodo->dato && ante != NULL)
+        if(lista->dato > nuevoNodo->dato)
         {
+            lista = agregarPpio(lista, nuevoNodo);
 
-            ante = ante->sig;
-            seg = seg->sig;
         }
+        else
+        {
+            ante = lista;
+            seg = lista->sig;
+            /*RECORRIDO DE LA LISTA, HASTA EL INSERTAR*/
 
-        nuevoNodo->sig = seg;
-        ante->sig = nuevoNodo;
+            while(seg != NULL && seg->dato < nuevoNodo->dato)
+            {
+
+
+                ante = ante->sig;
+                seg = seg->sig;
+            }
+
+            nuevoNodo->sig = seg;
+            ante->sig = nuevoNodo;
+        }
     }
-
-    return ante;
+    return lista;
 }
 
 int busquedaDatoNodo(nodo* lista, int dato)
 {
     int flag = 0;
 
-    while(lista != NULL){
+    while(lista != NULL)
+    {
 
         if(lista->dato == dato)
         {
@@ -285,6 +301,60 @@ int busquedaDatoNodo(nodo* lista, int dato)
     }
 
     return flag;
+}
+
+int buscarDato(nodo*lista,int dato)
+{
+    int flag=0;
+    while(lista!=NULL)
+    {
+        if(lista->dato==dato)
+        {
+
+            flag=1;
+            return flag;
+        }
+        else
+        {
+
+            lista = lista->sig;
+            flag=0;
+        }
+
+    }
+
+    return flag;
+}
+
+nodo* intercalarDatos(nodo* lista1, nodo* lista2)
+{
+
+    nodo* ante;
+    nodo* seg;
+
+    nodo* ante2;
+    nodo* seg2;
+
+    nodo* aux;
+
+    ante = lista1;
+    seg = lista1->sig;
+
+    ante2 = lista2;
+    seg2 = lista2->sig;
+
+    while(seg != NULL)
+    {
+        aux = ante2->dato;
+        ante2 = ante2->sig;
+        seg2 = seg2->sig;
+
+        seg->sig = seg;
+        aux->sig = seg;
+        ante->sig = aux;
+    }
+
+    return lista1;
 }
 /*ARCHIVOS*/
 
