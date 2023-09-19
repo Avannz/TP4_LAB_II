@@ -6,8 +6,14 @@ typedef struct
 
     int dato;
     struct nodo* sig;
-
 } nodo;
+
+typedef struct
+{
+
+    int dato;
+    nodo* sig;
+}Pila
 
 nodo* IniciarNodo ();
 nodo* agregarPpio(nodo* lista, nodo* nuevoNodo);
@@ -17,6 +23,7 @@ nodo* pasarDatosLIS(nodo* lista, FILE* archivo);
 nodo* ordenarNodo (nodo* lista, nodo* nuevoNodo);
 nodo* cargarNodoOrdenado(nodo* lista);
 nodo* intercalarListas (nodo* lista1, nodo* lista2, nodo* lista3);
+nodo* invertirLista (nodo* lista, nodo* lista2);
 void recorrerLista (nodo* lista);
 void escribir(nodo* aux);
 void cargarArchivo();
@@ -76,42 +83,50 @@ int main()
 
     case 3:
 
-            lista = cargarNodo(lista);
+        lista = cargarNodo(lista);
 
-            printf("Ingresa el dato ha encontrar: ");
-            fflush(stdin);
-            scanf("%d", &dato);
+        printf("Ingresa el dato ha encontrar: ");
+        fflush(stdin);
+        scanf("%d", &dato);
 
-            flag = busquedaDatoNodo(lista, dato);
+        flag = busquedaDatoNodo(lista, dato);
 
-            if(flag == 1)
-            {
+        if(flag == 1)
+        {
 
-                printf("Dato existente :D");
-            }
-            /*else if(flag == 0)        //PQ NO ME DICE QUE NO EXISTE???
-            {
+            printf("Dato existente :D");
+        }
+        /*else if(flag == 0)        //PQ NO ME DICE QUE NO EXISTE???
+        {
 
-                printf("Dato inexistente D:");
-            }*/
+            printf("Dato inexistente D:");
+        }*/
 
         break;
 
     case 4:
 
-            lista = IniciarNodo();
-            lista2 = IniciarNodo();
-            lista3 = IniciarNodo();
+        lista = IniciarNodo();
+        lista2 = IniciarNodo();
+        lista3 = IniciarNodo();
 
-            lista = cargarNodo(lista);
-            lista2 = cargarNodo(lista2);
+        lista = cargarNodo(lista);
+        lista2 = cargarNodo(lista2);
 
-            lista3 = intercalarListas(lista, lista2, lista3);
-            recorrerLista(lista3);
+        lista3 = intercalarListas(lista, lista2, lista3);
+        recorrerLista(lista3);
 
         break;
 
     case 5:
+
+        lista = IniciarNodo();
+        lista2 = IniciarNodo();
+
+        lista = cargarNodo(lista);
+
+        lista2 = invertirLista(lista, lista2);
+        recorrerLista(lista2);
 
         break;
 
@@ -281,7 +296,8 @@ int busquedaDatoNodo(nodo* lista, int dato)
 {
     int flag = 0;
 
-    while(lista != NULL){
+    while(lista != NULL)
+    {
 
         if(lista->dato == dato)
         {
@@ -298,7 +314,6 @@ int busquedaDatoNodo(nodo* lista, int dato)
 
     return flag;
 }
-
 nodo* intercalarListas (nodo* lista1, nodo* lista2, nodo* lista3)
 {
 
@@ -306,27 +321,174 @@ nodo* intercalarListas (nodo* lista1, nodo* lista2, nodo* lista3)
 
     while(lista1 != NULL & lista2 != NULL)
     {
-        if(lista1->dato > lista2->dato)
-        {
-            aux2 = lista2;
-            lista2 = lista2->sig;
 
-            aux2->sig = NULL;
-            lista3 = agregarPpio(lista3, aux2);
-        }
-        else
-        {
-            aux = lista1;
-            lista1 = lista1->sig;
+        aux2 = lista2;
+        lista2 = lista2->sig;
 
-            aux->sig = NULL;
-            lista3 = agregarPpio(lista3, aux);
-        }
+        aux2->sig = NULL;
+        lista3 = agregarPpio(lista3, aux2);
+
+        aux = lista1;
+        lista1 = lista1->sig;
+
+        aux->sig = NULL;
+        lista3 = agregarPpio(lista3, aux);
+
     }
 
     return lista3;
 }
+nodo* invertirLista (nodo* lista, nodo* lista2)
+{
 
+    nodo* aux;
+
+    while(lista != NULL)
+    {
+        aux = lista;
+        lista = lista->sig;
+
+        aux->sig = NULL;
+        lista2 = agregarPpio(lista2, aux);
+    }
+
+    return lista2;
+}
+
+// PILAS EN LISTAS //
+
+nodo* inicPila (Pila* pila)
+{
+    pila->sig = NULL;
+
+}
+int pilavacia(Pila* pila)
+{
+    int flag = 0;
+
+    if(pila->sig == NULL)
+    {
+
+        flag = 1;
+    }
+
+    return flag;
+}
+void mostrarPila(Pila *pila)
+{
+    printf("..................................\n");
+    while(pila != NULL)
+    {
+        
+        printf(" %d ", pila->dato);
+        pila = pila->sig;
+    }
+    printf("..................................\n");
+}
+void leer (Pila* pila)
+{
+
+    printf("Ingrsa un valor a la pila: ");
+    fflush(stdin);
+    scanf("%d" &pila->dato);
+
+    pila = pila->sig;
+}
+void apilar (Pila* pila, int dato)
+{
+    
+    pila = dato
+    pila = pila->sig;
+}
+void desapilar(Pila* pila)
+{
+    while(pila != NULL)
+    {
+    
+        pila = pila->sig;
+    }
+    
+    if(pila->sig == NULL)
+    {
+        
+        pila = NULL;
+    }
+    
+}
+
+
+/*ARCHIVOS*/
+
+
+int cargarUnArchivo()
+{
+
+    FILE* archi;
+    archi = fopen("miArchivo.bin", "ab");
+
+    int num;
+
+    if(archi != NULL)
+    {
+
+        printf("Ingresa un valor al archivo");
+        fflush(stdin);
+        scanf("%d", &num);
+
+        fwrite(&num, sizeof(int), 1, archi);
+
+        fclose(archi);
+    }
+
+}
+void cargarArchivo()
+{
+
+
+
+    FILE* archi;
+    archi = fopen("miArchivo.bin", "ab");
+
+    char letra = 's';
+
+    if(archi != NULL)
+    {
+        while(letra == 's')
+
+        {
+
+            cargarUnArchivo();
+
+            printf("Ingrese 's' para continuar: ");
+            fflush(stdin);
+            scanf("%c", &letra);
+
+        }
+
+        fclose(archi);
+    }
+}
+void mostrarArchivo(FILE* archivo)
+{
+    archivo = fopen("miArchivo.bin", "rb");
+    int num;
+
+    if(archivo != NULL)
+    {
+
+        while(!feof(archivo))
+        {
+
+            fread(&num, sizeof(int),1, archivo);
+
+            if(!feof(archivo))
+            {
+                printf("/ %d ", num);
+            }
+        }
+        fclose(archivo);
+    }
+}
 
 
 /*ARCHIVOS*/
